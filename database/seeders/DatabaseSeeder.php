@@ -2,9 +2,12 @@
 
 namespace Database\Seeders;
 
+use App\Models\PolyReview;
+use App\Models\Project;
 use App\Models\User;
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+
+// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 
 class DatabaseSeeder extends Seeder
 {
@@ -13,11 +16,12 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
+        $users = User::factory(15)->create();
 
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-        ]);
+        $projects = Project::factory(15)->withLoremImage()->create();
+
+        $projects->take(3)->each(function ($project) {
+            PolyReview::factory(5)->for($project, 'reviewable')->create();
+        });
     }
 }

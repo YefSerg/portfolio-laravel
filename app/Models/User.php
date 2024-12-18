@@ -3,14 +3,24 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Enums\UserRoles;
+use Database\Factories\UserFactory;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Notifications\Notifiable;
 
-class User extends Authenticatable
+/**
+ * @method static create(mixed $data)
+ * @property int $id
+ */
+class User extends Authenticatable implements MustVerifyEmail
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable;
+    /** @use HasFactory<UserFactory> */
+    use HasFactory, Notifiable, RefreshDatabase, SoftDeletes;
 
     /**
      * The attributes that are mass assignable.
@@ -19,6 +29,7 @@ class User extends Authenticatable
      */
     protected $fillable = [
         'name',
+        'role',
         'email',
         'password',
     ];
@@ -42,7 +53,13 @@ class User extends Authenticatable
     {
         return [
             'email_verified_at' => 'datetime',
+            'role' => UserRoles::class,
             'password' => 'hashed',
         ];
+    }
+
+    public function likes(): BelongsToMany
+    {
+        return $this->belongsToMany(Project::class, 'project_user_likes');
     }
 }
